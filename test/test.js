@@ -13,8 +13,10 @@ server.on('listening', () => {
         connArr.push(csock);
     });
     socket.on('connect', () => {
-        getSockOpt.getOriginalDst(socket, (err, fd) => {
-            assert.strict(Number.isInteger(fd));
+        getSockOpt.getOriginalDst(socket, (err, result) => {
+            assert.strict(result.family === 'IPv4');
+            assert.strict(result.address === '127.0.0.1');
+            assert.strict(result.port === port);
             server.close();
             connArr.forEach((sock) => sock.destroy());
         });
