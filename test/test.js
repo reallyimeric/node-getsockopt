@@ -4,23 +4,20 @@ const assert = require('assert');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { Socket, Server } = require('net');
 
+// TODO: need redir
 const server = new Server();
 server.on('listening', () => {
     const { port } = server.address();
     const socket = new Socket();
-    const connArr = [];
     server.on('connection', (csock) => {
-        connArr.push(csock);
-    });
-    socket.on('connect', () => {
-        getSockOpt.getOriginalDst(socket, (err, result) => {
+        getSockOpt.getOriginalDst(csock, (err, result) => {
             assert.strict(result.family === 'IPv4');
             assert.strict(result.address === '127.0.0.1');
             assert.strict(result.port === port);
             server.close();
-            connArr.forEach((sock) => sock.destroy());
+            csock.destroy();
         });
     });
-    socket.connect(port, 'localhost');
+    socket.connect(port, '127.0.0.1');
 });
 server.listen();
